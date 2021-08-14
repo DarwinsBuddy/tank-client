@@ -1,0 +1,11 @@
+[Unit]
+Description=TANK WebUI
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=python -m tank
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
