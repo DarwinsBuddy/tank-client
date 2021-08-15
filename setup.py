@@ -3,17 +3,6 @@ from distutils.command.install import install
 
 from setuptools import setup, find_packages
 
-
-def get_dependencies() -> [str]:
-    deps = [
-        'APScheduler==3.7.0',
-        'pyzmq==22.2.1'
-    ]
-    if is_raspberry():
-        deps.append('RPi.GPIO==0.7.0')
-    return deps
-
-
 def is_raspberry():
     (sysname, nodename, release, version, machine) = os.uname()
     return sysname == 'Linux' and machine == 'armv6l'
@@ -47,5 +36,9 @@ setup(
     cmdclass={
         'install': InstallWrapper,
     },
-    install_requires=get_dependencies()
+    install_requires=[
+        'APScheduler==3.7.0',
+        'pyzmq==22.2.1',
+        'RPi.GPIO==0.7.0' if is_raspberry() else ''
+    ]
 )
