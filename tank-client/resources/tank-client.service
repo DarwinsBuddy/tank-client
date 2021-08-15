@@ -1,10 +1,10 @@
 [Unit]
-Description=TANK WebUI
+Description=TANK client
 After=syslog.target network.target
 
 [Service]
 Type=simple
-ExecStart=python -m tank
+ExecStart=python3 -m tank-client
 Restart=on-abort
 
 [Install]
