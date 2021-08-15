@@ -2,6 +2,20 @@ from distutils.command.install import install
 
 from setuptools import setup, find_packages
 
+dependencies = [
+    'APScheduler==3.7.0',
+    'pyzmq==22.2.1'
+]
+
+
+def is_raspberry():
+    (sysname, nodename, release, version, machine) = os.uname()
+    return sysname == 'Linux' and machine == 'armv6l'
+
+
+if is_raspberry():
+    dependencies.append('RPi.GPIO==0.7.0')
+
 RESOURCES = "resources"
 MODULE = "tank-client"
 
@@ -19,7 +33,9 @@ setup(
     platforms="any",
     version='0.1.0',
     packages=find_packages(
-        include=[f'{MODULE}', f'{MODULE}.*']
+        include=[
+            f'{MODULE}', f'{MODULE}.*'
+        ]
     ),
     package_data={"tank-client": [
         "resources/tank-client.service"
@@ -27,8 +43,5 @@ setup(
     cmdclass={
         'install': InstallWrapper,
     },
-    install_requires=[
-        'APScheduler==3.7.0',
-        'pyzmq==22.2.1'
-    ]
+    install_requires=dependencies
 )
