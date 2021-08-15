@@ -38,7 +38,8 @@ setup(
         ]
     ),
     package_data={"tank-client": [
-        "resources/tank-client.service"
+        "resources/tank-client.service",
+        "resources/tank-client.conf"
     ]},
     cmdclass={
         'install': InstallWrapper,

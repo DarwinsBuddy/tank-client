@@ -1,22 +1,22 @@
 import os
 import random
 
+from .config import AppConfig
 from apscheduler.schedulers.background import BlockingScheduler
 
-from .config import args, MEASURING_INTERVAL
 from .zeromq import ZMQPublisher
 
 
 class App:
 
-    def __init__(self, app_config):
-        self.publisher = ZMQPublisher("depth", address=args.zmq_addr, port=args.zmq_port)
+    def __init__(self, app_config: AppConfig):
+        self.app_config = app_config
+        self.publisher = ZMQPublisher("depth", address=self.app_config.zmq_addr, port=self.app_config.zmq_port)
         if self.is_raspberry():
             from .ultrasonic import Sensor
             self.sensor = Sensor()
         else:
             self.sensor = None
-        self.app_config = app_config
         self.scheduler = BlockingScheduler(
             job_executors=self.app_config.SCHEDULER_EXECUTORS,
             job_defaults=self.app_config.SCHEDULER_JOB_DEFAULTS,
@@ -46,12 +46,12 @@ class App:
             print("Unable to measure depth - sensor not initialized")
 
     def add_jobs(self):
-        if args.mock or not self.is_raspberry():
+        if self.app_config.args.mock or not self.is_raspberry():
             print("Mocking measurements (either mock mode activated, or not a raspberry pi)")
             self.scheduler.add_job(func=self.mock_measure_depth,
                                    args=[100, 250],
                                    trigger='interval',
-                                   seconds=MEASURING_INTERVAL,
+                                   seconds=self.app_config.MEASURING_INTERVAL,
                                    id='mock_measure_depth',
                                    name='measuring depth',
                                    replace_existing=True
@@ -60,7 +60,7 @@ class App:
             self.scheduler.add_job(func=self.avg_measure_depth,
                                    args=[5],
                                    trigger='interval',
-                                   seconds=MEASURING_INTERVAL,
+                                   seconds=self.app_config.MEASURING_INTERVAL,
                                    id='measure_depth',
                                    name='measuring depth',
                                    replace_existing=True

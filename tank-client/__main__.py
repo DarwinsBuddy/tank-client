@@ -6,7 +6,7 @@ from .config import AppConfig
 from .app import App
 
 if __name__ == "__main__":
-    app = App(AppConfig())
+    app = App(AppConfig(AppConfig.parse_args()))
 
     # Shut down the scheduler when exiting the app
     # atexit.register(stop_application)
