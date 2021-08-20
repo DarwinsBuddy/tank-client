@@ -1,7 +1,7 @@
 import argparse
 import configparser
 
-import pkg_resources
+from . import get_data
 
 
 class AppConfig:
@@ -40,13 +40,14 @@ class AppConfig:
         parser.add_argument('-m', '--mock', action='store_true', help='Start with mocked measurements', default=False)
         parser.add_argument('-c', '--config', type=str,
                             help='Path to config file',
-                            default=pkg_resources.resource_filename('tank-client', 'resources/tank-client.conf')
+                            default=get_data('tank-client.conf')
                             )
 
         return parser.parse_args()
 
     @staticmethod
     def read_config(path):
+        print(f"Reading config file '{path}'")
         config = configparser.ConfigParser()
         with open(path, 'r') as configfile:
             config.read_file(configfile)

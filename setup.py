@@ -16,7 +16,6 @@ def is_raspberry():
     return sysname == 'Linux' and machine == 'armv6l'
 
 
-RESOURCES = "resources"
 MODULE = "tank-client"
 
 
@@ -50,8 +49,8 @@ setup(
         ]
     ),
     package_data={"tank-client": [
-        "resources/tank-client.service",
-        "resources/tank-client.conf"
+        "data/tank-client.service",
+        "data/tank-client.conf"
     ]},
     cmdclass={
         'install': InstallWrapper,
