@@ -38,6 +38,14 @@ class AppConfig:
     def parse_args() -> argparse.Namespace:
         parser = argparse.ArgumentParser(description='Tank Client')
         parser.add_argument('-m', '--mock', action='store_true', help='Start with mocked measurements', default=False)
+        parser.add_argument('-a', '--zmq-address', type=str,
+                            help='IP address of tank server',
+                            default=None
+                            )
+        parser.add_argument('-p', '--zmq-port', type=int,
+                            help='ZMQ port of tank server',
+                            default=None
+                            )
         parser.add_argument('-c', '--config', type=str,
                             help='Path to config file',
                             default=get_data('tank-client.conf')
@@ -56,5 +64,11 @@ class AppConfig:
     def __init__(self, args: argparse.Namespace):
         self.args = args
         self.config = self.read_config(args.config)
-        self.zmq_addr = self.config['Server']['address'] or '127.0.0.1'
-        self.zmq_port = self.config['Server']['zmq-port'] or 5555
+        if self.args.zmq_address is not None:
+            self.zmq_addr = self.args.zmq_address
+        else:
+            self.zmq_addr = self.config['Server']['address'] or '127.0.0.1'
+        if self.args.zmq_port is not None:
+            self.zmq_port = self.args.zmq_port
+        else:
+            self.zmq_port = self.config['Server']['zmq-port'] or 5555
