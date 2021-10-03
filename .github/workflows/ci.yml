@@ -11,7 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        platform: [linux]
+        platform: [any]
     runs-on: ubuntu-latest
     steps:
     - name: Clone repository
@@ -37,8 +37,8 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./dist/tank-${{ env.RELEASE_VERSION }}-py3-none-${{matrix.platform}}.whl
-        asset_name: "tank-${{ env.RELEASE_VERSION }}-py3-none-${{matrix.platform}}.whl"
+        file: ./dist/tank_client-${{ env.RELEASE_VERSION }}-py3-none-${{matrix.platform}}.whl
+        asset_name: "tank_client-${{ env.RELEASE_VERSION }}-py3-none-${{matrix.platform}}.whl"
         overwrite: true
         tag: ${{ github.ref }}
         prerelease: false
