@@ -6,7 +6,6 @@ from . import get_data
 
 class AppConfig:
     ZMQ_RECV_TIMEOUT = 1000
-    MEASURING_INTERVAL = 5
     # SCHEDULER_JOBSTORES = {
     #    'mongo': {
     #        'type': 'mongodb'
@@ -30,7 +29,7 @@ class AppConfig:
     SCHEDULER_JOB_DEFAULTS = {
         'coalesce': False,  # Close the new job by default at #
         # 3 set maximum number of instances running simultaneously scheduler particular job
-        'max_instances': 3
+        'max_instances': 1
     }
     SCHEDULER_PAUSED = True
 
@@ -44,6 +43,10 @@ class AppConfig:
                             )
         parser.add_argument('-p', '--zmq-port', type=int,
                             help='ZMQ port of tank server',
+                            default=None
+                            )
+        parser.add_argument('-i', '--measurement-interval', type=int,
+                            help='Interval in seconds between depth measurements',
                             default=None
                             )
         parser.add_argument('-c', '--config', type=str,
@@ -72,3 +75,7 @@ class AppConfig:
             self.zmq_port = self.args.zmq_port
         else:
             self.zmq_port = self.config['Server']['zmq-port'] or 5555
+        if self.args.measurement_interval is not None:
+            self.measurement_interval = self.args.measurement_interval
+        else:
+            self.measurement_interval = int(self.config['Server']['measurement-interval']) or 5

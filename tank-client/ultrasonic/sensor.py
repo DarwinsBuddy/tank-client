@@ -1,4 +1,6 @@
 import time
+from collections import deque
+
 from RPi import GPIO
 
 
@@ -16,7 +18,9 @@ class Sensor:
     # Speed of sound in m/s at temperature
     speedSound = speedSound_raw + (0.6 * temperature)
 
-    def __init__(self):
+    def __init__(self, n=AVG_MEASUREMENTS):
+        self.n = n
+        self.storage = deque(maxlen=n)
         # Use BCM GPIO references
         # not physical pin numbering
         GPIO.setmode(GPIO.BCM)
@@ -59,14 +63,19 @@ class Sensor:
 
         return distance
 
-    def avg_measure(self, n=AVG_MEASUREMENTS):
+    def deque_measure(self):
+        self.storage.append(self.measure())
+        ls = list(self.storage)
+        return sum(ls) / len(ls)
+
+    def avg_measure(self):
         # Take n measurements, return average
         distances = []
-        for i in range(0, n):
+        for i in range(0, self.n):
             distances.append(self.measure())
             time.sleep(self.WAIT_TIME)
 
-        return sum(distances) / n
+        return sum(distances) / self.n
 
     @staticmethod
     def cleanup():
