@@ -3,9 +3,9 @@
 # Dependencies
 
 ## Building
-* npm / node 16.6.2
-* python3.9+
+* python3.7+
 ## Installation
+* required `pigpiod`
 * (optional) systemd
 
 # Install / Start

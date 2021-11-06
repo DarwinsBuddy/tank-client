@@ -14,7 +14,7 @@ class App:
         self.publisher = ZMQPublisher("depth", address=self.app_config.zmq_addr, port=self.app_config.zmq_port)
         if self.is_raspberry():
             from .ultrasonic import Sensor
-            self.sensor = Sensor()
+            self.sensor = Sensor(app_config.sma)
         else:
             self.sensor = None
         self.scheduler = BlockingScheduler(
@@ -28,10 +28,15 @@ class App:
         (sysname, nodename, release, version, machine) = os.uname()
         return sysname == 'Linux' and machine == 'armv6l'
 
+    def broadcast(self):
+        self.publish_depth(self.sensor.current_depth())
+
     def publish_depth(self, depth):
-        print("[MEASURING] ", depth)
-        if self.publisher is not None:
+        if self.publisher is not None and depth is not None:
+            print(f"[Broadcasting] {depth}")
             self.publisher.send(f'{depth}')
+        else:
+            print(f"Skipping broadcast depth={depth}")
 
     def mock_measure_depth(self, min_depth=0, max_depth=165):
         # mocked measuring
@@ -40,8 +45,8 @@ class App:
 
     def avg_measure_depth(self):
         if self.sensor is not None:
-            depth = self.sensor.deque_measure()
-            self.publish_depth(depth)
+            # print("[MEASURING]")
+            self.sensor.measure()
         else:
             print("Unable to measure depth - sensor not initialized")
 
@@ -57,6 +62,14 @@ class App:
                                    replace_existing=True
                                    )
         else:
+            self.scheduler.add_job(func=self.broadcast,
+                                   args=[],
+                                   trigger='interval',
+                                   seconds=self.app_config.broadcast_interval,
+                                   id='broadcast_depth',
+                                   name='broadcast depth',
+                                   replace_existing=True
+                                   )
             self.scheduler.add_job(func=self.avg_measure_depth,
                                    args=[],
                                    trigger='interval',

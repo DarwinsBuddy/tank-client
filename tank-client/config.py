@@ -29,7 +29,7 @@ class AppConfig:
     SCHEDULER_JOB_DEFAULTS = {
         'coalesce': False,  # Close the new job by default at #
         # 3 set maximum number of instances running simultaneously scheduler particular job
-        'max_instances': 1
+        'max_instances': 2
     }
     SCHEDULER_PAUSED = True
 
@@ -45,8 +45,16 @@ class AppConfig:
                             help='ZMQ port of tank server',
                             default=None
                             )
+        parser.add_argument('-s', '--sma', type=int,
+                            help='How many measurements for forming an SMA. i.e. SMA(n)',
+                            default=None
+                            )
         parser.add_argument('-i', '--measurement-interval', type=int,
                             help='Interval in seconds between depth measurements',
+                            default=None
+                            )
+        parser.add_argument('-b', '--broadcast-interval', type=int,
+                            help='Interval in seconds between depth broadcasts',
                             default=None
                             )
         parser.add_argument('-c', '--config', type=str,
@@ -75,7 +83,16 @@ class AppConfig:
             self.zmq_port = self.args.zmq_port
         else:
             self.zmq_port = self.config['Server']['zmq-port'] or 5555
+
+        if self.args.sma is not None:
+            self.sma = self.args.sma
+        else:
+            self.sma = int(self.config['Server']['sma']) or 5
         if self.args.measurement_interval is not None:
             self.measurement_interval = self.args.measurement_interval
         else:
-            self.measurement_interval = int(self.config['Server']['measurement-interval']) or 5
+            self.measurement_interval = int(self.config['Server']['measurement-interval']) or 10
+        if self.args.broadcast_interval is not None:
+            self.broadcast_interval = self.args.broadcast_interval
+        else:
+            self.broadcast_interval = int(self.config['Server']['broadcast-interval']) or 6

@@ -7,7 +7,8 @@ from setuptools import setup, find_packages
 
 deps = [
     'APScheduler==3.7.0',
-    'pyzmq==22.2.1'
+    'pyzmq==22.2.1',
+    'pigpio==1.78'
 ]
 
 
@@ -42,7 +43,7 @@ setup(
     author="Christoph Spörk",
     author_email="christoph.spoerk@gmail.com",
     platforms="any",
-    version='1.1.0',
+    version='1.1.1',
     packages=find_packages(
         include=[
             f'{MODULE}', f'{MODULE}.*'
