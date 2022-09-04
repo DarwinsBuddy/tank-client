@@ -6,9 +6,10 @@ from distutils.command.install import install
 from setuptools import setup, find_packages
 
 deps = [
-    'APScheduler==3.7.0',
-    'pyzmq==22.2.1',
-    'pigpio==1.78'
+    'APScheduler==3.9.1',
+    'pyzmq==23.2.1',
+    'pigpio==1.78',
+    'paho-mqtt==1.6.1'
 ]
 
 
@@ -43,7 +44,7 @@ setup(
     author="Christoph Spörk",
     author_email="christoph.spoerk@gmail.com",
     platforms="any",
-    version='1.1.1',
+    version='2.0.0',
     packages=find_packages(
         include=[
             f'{MODULE}', f'{MODULE}.*'

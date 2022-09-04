@@ -1,0 +1,5 @@
+APScheduler==3.9.1
+pyzmq==23.2.1
+pigpio~=1.78
+setuptools==65.3.0
+paho-mqtt~=1.6.1

@@ -4,14 +4,25 @@ import random
 from apscheduler.schedulers.background import BlockingScheduler
 
 from .config import AppConfig
-from .zeromq import ZMQPublisher
 
 
 class App:
 
     def __init__(self, app_config: AppConfig):
         self.app_config = app_config
-        self.publisher = ZMQPublisher("depth", address=self.app_config.zmq_addr, port=self.app_config.zmq_port)
+        if self.app_config.mode == 'server':
+            from .zeromq import ZMQPublisher
+            self.publisher = ZMQPublisher("depth", address=self.app_config.zmq_addr, port=self.app_config.zmq_port)
+        else:
+            from .mqtt import MQTTClient
+            user = self.app_config.mqtt_username
+            pw = self.app_config.mqtt_password
+            mqtt_auth = {"username": user, "password": pw} if user is not None and pw is not None else None
+            self.publisher = MQTTClient(
+                broker=self.app_config.mqtt_broker,
+                topic_prefix=self.app_config.mqtt_topic,
+                mqtt_auth=mqtt_auth
+            )
         if self.is_raspberry():
             from .ultrasonic import Sensor
             self.sensor = Sensor(app_config.sma)
@@ -33,10 +44,10 @@ class App:
 
     def publish_depth(self, depth):
         if self.publisher is not None and depth is not None:
-            print(f"[Broadcasting] {depth}")
-            self.publisher.send(f'{depth}')
+            self.print(f"[Broadcasting] {depth}")
+            self.publisher.send(depth)
         else:
-            print(f"Skipping broadcast depth={depth}")
+            self.print(f"Skipping broadcast depth={depth}")
 
     def mock_measure_depth(self, min_depth=0, max_depth=165):
         # mocked measuring
@@ -45,7 +56,7 @@ class App:
 
     def avg_measure_depth(self):
         if self.sensor is not None:
-            # print("[MEASURING]")
+            # self.print("[MEASURING]")
             self.sensor.measure()
         else:
             print("Unable to measure depth - sensor not initialized")
@@ -79,23 +90,26 @@ class App:
                                    replace_existing=True
                                    )
 
+    def print(self, s: str):
+        if not self.app_config.quiet:
+            print(s)
+
     def stop(self):
         if self.scheduler is not None and self.scheduler.running:
             self.scheduler.shutdown(wait=False)
-        print("shutdown zmq")
         if self.publisher is not None:
-            print('shutdown zmq pub')
+            self.print('shutdown publisher')
             self.publisher.close()
         if self.sensor is not None:
-            print("Reset GPIO")
+            self.print("Reset GPIO")
             self.sensor.cleanup()
 
     def start(self):
-        print("Adding jobs")
+        self.print("Adding jobs")
         self.add_jobs()
-        print("___________________")
-        print(self.app_config)
-        print("___________________")
-        print("Starting Scheduler")
+        self.print("___________________")
+        self.print(self.app_config)
+        self.print("___________________")
+        self.print("Starting Scheduler")
         self.scheduler.start()
-        print("END")
+        self.print("END")
