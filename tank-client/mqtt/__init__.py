@@ -12,9 +12,9 @@ class MQTTClient:
         self.topic_prefix = topic_prefix
         self.broker = broker
         self.mqtt_auth = mqtt_auth
-        self.client = mqtt.Client("ha-client")
+        self.client = mqtt.Client("tank-client")
         self.client.username_pw_set(**mqtt_auth)
-        print(f"Publishing {DEFAULT_TOPIC_PREFIX} on {self.broker}")
+        # print(f"Publishing {self.topic_prefix} on {self.broker}")
         self.connect()
 
     def connect(self):
@@ -24,6 +24,7 @@ class MQTTClient:
     def pub(self, value, topic=None):
         t = f"/{topic}" if topic is not None else ''
         try:
+            # print(f"{self.broker} -> {self.topic_prefix}{t}", value)
             self.client.publish(f'{self.topic_prefix}{t}', value)
         except Exception as e:
             print("ERROR - Unable to send MQTT msg", e)
@@ -45,6 +46,7 @@ class MQTTClient:
 def pub(value, topic_prefix=DEFAULT_TOPIC_PREFIX, broker='127.0.0.1', mqtt_auth=None, topic=None):
     t = f"/{topic}" if topic is not None else ''
     try:
+        # print(f"{broker} -> {topic_prefix}{t}", value)
         publish.single(f'{topic_prefix}{t}', value, hostname=broker, auth=mqtt_auth)
     except Exception as e:
         print("ERROR - Unable to send MQTT msg", e)

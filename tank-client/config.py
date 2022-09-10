@@ -113,7 +113,7 @@ class AppConfig:
             if self.args.quiet is not None:
                 self.quiet = self.args.quiet
             else:
-                self.quiet = self.config['General']['quiet'] or False
+                self.quiet = (self.config['General']['quiet'] in ["True", "true"]) or False
             if self.args.sma is not None:
                 self.sma = self.args.sma
             else:

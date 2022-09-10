@@ -4,6 +4,7 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
+WorkingDirectory=/home/pi/tank-client/
 ExecStart=python3 -m tank-client
 Restart=on-abort
 

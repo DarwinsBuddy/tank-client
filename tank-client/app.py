@@ -56,7 +56,7 @@ class App:
 
     def avg_measure_depth(self):
         if self.sensor is not None:
-            # self.print("[MEASURING]")
+            self.print("[MEASURING]")
             self.sensor.measure()
         else:
             print("Unable to measure depth - sensor not initialized")
