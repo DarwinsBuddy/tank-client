@@ -14,13 +14,14 @@ class MQTTClient:
         self.mqtt_auth = mqtt_auth
         self.client = mqtt.Client("ha-client")
         self.client.username_pw_set(**mqtt_auth)
+        print(f"Publishing {DEFAULT_TOPIC_PREFIX} on {self.broker}")
         self.connect()
 
     def connect(self):
         self.client.connect(self.broker)
         self.client.loop_start()
 
-    def pub(self, value: str | int, topic=None):
+    def pub(self, value, topic=None):
         t = f"/{topic}" if topic is not None else ''
         try:
             self.client.publish(f'{self.topic_prefix}{t}', value)
@@ -30,7 +31,7 @@ class MQTTClient:
             self.client.disconnect()
             self.connect()
 
-    def send(self, value: str | float):
+    def send(self, value):
         self.pub("online", topic="availability")
         v = int(float(value) * 100) if type(value) == float else value
         self.pub(v)
