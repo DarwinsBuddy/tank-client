@@ -3,6 +3,7 @@ import time
 import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 
+AVAILABILITY = "availability"
 
 DEFAULT_TOPIC_PREFIX = 'home-assistant/tank'
 
@@ -14,12 +15,14 @@ class MQTTClient:
         self.mqtt_auth = mqtt_auth
         self.client = mqtt.Client("tank-client")
         self.client.username_pw_set(**mqtt_auth)
-        # print(f"Publishing {self.topic_prefix} on {self.broker}")
+        self.client.will_set(f'{self.topic_prefix}/{AVAILABILITY}', 'offline', 1, True)
+        print(f"Publishing {DEFAULT_TOPIC_PREFIX} on {self.broker}")
         self.connect()
 
     def connect(self):
         self.client.connect(self.broker)
         self.client.loop_start()
+        self.pub("online", topic=AVAILABILITY)
 
     def pub(self, value, topic=None):
         t = f"/{topic}" if topic is not None else ''
@@ -33,12 +36,12 @@ class MQTTClient:
             self.connect()
 
     def send(self, value):
-        self.pub("online", topic="availability")
+        self.pub("online", topic=AVAILABILITY)
         v = int(float(value) * 100) if type(value) == float else value
         self.pub(v)
 
     def close(self):
-        self.pub("offline", topic="availability")
+        self.pub("offline", topic=AVAILABILITY)
         time.sleep(1)
         self.client.disconnect()
 
